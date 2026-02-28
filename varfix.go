@@ -93,6 +93,54 @@ func run(pass *analysis.Pass) (interface{}, error) {
 						}
 					}
 				}
+			case *ast.IfStmt:
+				if assign, ok := s.Init.(*ast.AssignStmt); ok && assign.Tok == token.DEFINE {
+					var canConvert = true
+					for _, lhs := range assign.Lhs {
+						if ident, ok := lhs.(*ast.Ident); ok {
+							if declared[ident.Name] {
+								canConvert = false
+								break
+							}
+						} else {
+							canConvert = false
+							break
+						}
+					}
+					if canConvert {
+						var varDecl = &ast.GenDecl{Tok: token.VAR}
+						var vspec = &ast.ValueSpec{Values: assign.Rhs}
+						for _, lhs := range assign.Lhs {
+							var ident = lhs.(*ast.Ident)
+							vspec.Names = append(vspec.Names, ident)
+							declared[ident.Name] = true
+						}
+						varDecl.Specs = []ast.Spec{vspec}
+						var declStmt = &ast.DeclStmt{Decl: varDecl}
+
+						var buf bytes.Buffer
+						if err := format.Node(&buf, pass.Fset, declStmt); err == nil {
+							buf.WriteString("\n")
+							var newIf = *s
+							newIf.Init = nil
+							if err := format.Node(&buf, pass.Fset, &newIf); err == nil {
+								pass.Report(analysis.Diagnostic{
+									Pos:     s.Pos(),
+									End:     s.End(),
+									Message: "use explicit var declaration instead of :=",
+									SuggestedFixes: []analysis.SuggestedFix{{
+										Message: "Replace := with var",
+										TextEdits: []analysis.TextEdit{{
+											Pos:     s.Pos(),
+											End:     s.End(),
+											NewText: buf.Bytes(),
+										}},
+									}},
+								})
+							}
+						}
+					}
+				}
 			}
 		}
 	})

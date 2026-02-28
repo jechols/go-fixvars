@@ -64,7 +64,7 @@ func Example_goFix() {
 	// Output:
 	// --- main.go (old)
 	// +++ main.go (new)
-	// @@ -6,7 +6,7 @@
+	// @@ -6,10 +6,11 @@
 	//  )
 	//
 	//  func main() {
@@ -72,5 +72,10 @@ func Example_goFix() {
 	// +	var x = 1
 	//  	var y = x + 1
 	//
-	//  	if info, err := os.Stat("no"); err == nil {
+	// -	if info, err := os.Stat("no"); err == nil {
+	// +	var info, err = os.Stat("no")
+	// +	if err == nil {
+	//  		fmt.Printf("Info: %#v\n", info)
+	//  	} else {
+	//  		fmt.Printf("y is %d\n", y)
 }
