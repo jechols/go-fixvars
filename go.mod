@@ -1,4 +1,4 @@
-module gofix-vars
+module github.com/jechols/go-fixvars
 
 go 1.26
 

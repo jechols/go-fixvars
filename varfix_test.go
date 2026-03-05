@@ -1,4 +1,4 @@
-package fixvars
+package main
 
 import (
 	"testing"

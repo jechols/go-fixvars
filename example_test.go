@@ -1,4 +1,4 @@
-package fixvars_test
+package main_test
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ func Example_goFix() {
 
 	var toolPath = filepath.Join(tmpDir, "fixvars")
 
-	var buildCmd = exec.Command("go", "build", "-o", toolPath, "./cmd/fixvars")
+	var buildCmd = exec.Command("go", "build", "-o", toolPath, ".")
 	if out, err := buildCmd.CombinedOutput(); err != nil {
 		fmt.Printf("failed to build tool: %v\nOutput: %s\n", err, string(out))
 		return

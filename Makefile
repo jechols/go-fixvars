@@ -1,6 +1,6 @@
 .PHONY: build
 build:
-	go build -o bin/fixvars ./cmd/fixvars
+	go build -o bin/fixvars .
 
 .PHONY: test
 test:
